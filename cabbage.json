@@ -27,8 +27,8 @@
         "aliases": [
             "khan"
         ],
-        "cabbageCount": 4,
-        "minimuffins": 2,
-        "turnips": 1
+        "cabbageCount": 8,
+        "minimuffins": 3,
+        "turnips": 2
     }
 }

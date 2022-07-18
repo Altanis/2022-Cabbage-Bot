@@ -150,7 +150,7 @@ client.on('messageCreate', function(message) {
                 fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));
 
                 embed.setColor('Green')
-                    .setDescription(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`)
+                    .setDescription(`<@${message.author.id}>, you have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`)
                     .addFields({
                         name: 'Incriminating Message', value: `[Jump!](${info.link})`
                     });
@@ -162,7 +162,7 @@ client.on('messageCreate', function(message) {
                 fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));
 
                 embed.setColor('Green')
-                    .setDescription(`You have used a turnip. Turnip usage: \`${client.cabbageInfo[message.author.id].turnips}\`.`)
+                    .setDescription(`<@${message.author.id}>, you have used a turnip. Turnip usage: \`${client.cabbageInfo[message.author.id].turnips}\`.`)
                     .addFields({
                         name: 'Incriminating Message', value: `[Jump!](${info.link})`
                     });
@@ -173,15 +173,19 @@ client.on('messageCreate', function(message) {
             }
         }  
         
-        if (message.content.startsWith('cabbage')) {
+        let cont = true;
+
+        if (message.content.replaceAll(' ', '').startsWith('cabbageimproperusage')) {
             client.atStake.forEach(info => {
-                if (info.authorID === message.author.id && info.cabbageable) {
+                if (info.authorID === 'improper usage') {
+                    cont = false;
+
                     client.atStake.delete(info.id);
                     client.cabbageInfo[info.id].cabbageCount++;
                     fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));    
 
                     embed.setColor('Red')
-                        .setDescription(`You have been cabbaged by <@${info.authorID}>. Cabbage count: \`${client.cabbageInfo[info.id].cabbageCount}\`.`)
+                        .setDescription(`<@${info.id}>, you have been cabbaged by <@${message.author.id}>. Cabbage count: \`${client.cabbageInfo[info.id].cabbageCount}\`.`)
                         .addFields({
                             name: 'Incriminating Message', value: `[Jump!](${info.link})`
                         });
@@ -189,6 +193,51 @@ client.on('messageCreate', function(message) {
                     message.reply({ embeds: [embed] });
                 }
             });
+        } else if (message.content.startsWith('cabbage') && cont) {
+            let passed = false;
+
+            client.atStake.forEach(info => {
+                if (info.authorID === message.author.id && info.cabbageable) {
+                    passed = true;
+
+                    client.atStake.delete(info.id);
+                    client.cabbageInfo[info.id].cabbageCount++;
+                    fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));    
+
+                    embed.setColor('Red')
+                        .setDescription(`<@${info.id}>, you have been cabbaged by <@${info.authorID}>. Cabbage count: \`${client.cabbageInfo[info.id].cabbageCount}\`.`)
+                        .addFields({
+                            name: 'Incriminating Message', value: `[Jump!](${info.link})`
+                        });
+
+                    message.reply({ embeds: [embed] });
+                }
+            });
+
+            if (!passed) {
+                client.atStake.set(message.author.id, {
+                    link: `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
+                    timestamp: Date.now(), 
+                    authorID: 'improper usage',
+                    id: message.author.id, 
+                });
+            }
+        }
+
+        if (message.content.replaceAll(' ', '').startsWith('iam')) {
+            const tempAlias = message.content.split(' ')[2];
+
+            client.cabbageInfo[message.author.id].aliases.push(tempAlias);
+            setTimeout(() => {
+                client.cabbageInfo[message.author.id].aliases.splice(client.cabbageInfo[message.author.id].aliases.indexOf(tempAlias), 1);
+            }, 1e4);
+        } else if (message.content.replaceAll(' ', '').startsWith('im') || message.content.replaceAll(' ', '').startsWith('i\'m')) {
+            const tempAlias = message.content.split(' ')[1];
+
+            client.cabbageInfo[message.author.id].aliases.push(tempAlias);
+            setTimeout(() => {
+                client.cabbageInfo[message.author.id].aliases.splice(client.cabbageInfo[message.author.id].aliases.indexOf(tempAlias), 1);
+            }, 1e4);
         }
 
         // SLOW CODE INCOMING: ⚠
@@ -198,7 +247,7 @@ client.on('messageCreate', function(message) {
             if (info.aliases.includes(username)) id = identifier;
         });
         // ok phew no more slow code
-        
+
         if (!id) return;
         if (message.author.id !== id && !client.atStake.get(id)) client.atStake.set(id, {
             link: `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
