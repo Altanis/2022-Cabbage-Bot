@@ -1,5 +1,6 @@
 # Cabbage Bot
 A bot which counts how many cabbages and minimuffins someone has received/used. A running joke within BxSci.
+Inspiration from [a repo AngleSideAngle made](https://github.com/AngleSideAngle/Cabbage), check it out!
 
 ## Key Terms
 - Cabbaged: Receiving a cabbage
@@ -15,7 +16,7 @@ A bot which counts how many cabbages and minimuffins someone has received/used. 
 - If you do not use minimuffin, or you do not use it correctly (not at the start of your first sentence after someone tries cabbaging you), the person can say "cabbage" and you will have been cabbaged.
 - If the person does not cabbage the target within 10 seconds, the player can say "turnip" and the cabbage cannot process.
 - If the person does not cabbage you properly but still sends "cabbage", the target can cabbage them back by saying "cabbage improper usage".
-- If someone says "i am <adjective>", adjective being anything like "tired", "hungry", etc, that can be a new temporary alias until 10 seconds have passed or you have already gotten cabbaged.
+- If someone says "i am [insert adjective here]", adjective being anything like "tired", "hungry", etc, that can be a new temporary alias until 10 seconds have passed or you have already gotten cabbaged.
     
 ### [HAS NOT BEEN IMPLEMENTED INTO BOT YET]
 - Everything so far has been implmented.
