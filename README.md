@@ -30,3 +30,5 @@ After that, people who have registered must play the game themselves. The bot wi
 The person's cabbaging attempt **must** end with an alias the bot knows (from  the `.register` command), or else it won't work.<p>
 
 You can use the command `.leaderboard` to get a leaderboard, sorted from the people with the most amount of cabbages to the least amount of cabbages.
+
+## Example of Bot Usage
