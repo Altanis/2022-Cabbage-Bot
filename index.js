@@ -10,6 +10,7 @@ const SharpClient = class extends Client {
         this.PREFIX = '.';
         this.cabbageInfo = require('./cabbage.json');
         
+        this.cabbageAttemps = {};
         this.atStake = [];
         this.messages = new Map();
     }
@@ -137,12 +138,15 @@ client.on('messageCreate', function(message) {
                 });
         }
     } else {
+        message.content = message.content.toLowerCase();
+        
         if (client.atStake.includes(message.author.id)) {
-            if (message.content.replaceAll(' ', '').includes('minimuffin')) {
+            if (message.content.replaceAll(' ', '').startsWith('minimuffin')) {
                 client.cabbageInfo[message.author.id].minimuffins++;
                 fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
                 message.reply(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`, { allowedMentions });
             } else {
+                // if (message.content.startsWith('turnip') && client.cabbageAttempts)
                 client.atStake.splice(client.atStake.indexOf(message.author.id), 1);
                 client.cabbageInfo[message.author.id].cabbageCount++;
                 fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
