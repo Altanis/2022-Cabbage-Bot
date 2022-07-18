@@ -136,7 +136,7 @@ client.on('messageCreate', function(message) {
             // ok phew no more slow code
             
             if (!id) return;
-            client.atStake.push(id);
+            if (message.author.id !== id) client.atStake.push(id);
             
             if (client.atStake.includes(message.author.id)) {
                 if (message.content.replaceAll(' ', '').includes('minimuffin')) {
