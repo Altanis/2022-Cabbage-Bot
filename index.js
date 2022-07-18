@@ -15,7 +15,7 @@ const SharpClient = class extends Client {
     }
 }
 
-const client = new SharpClient();
+const client = new SharpClient({ intents: [131071] });
 
 
 client.login(process.env.TOKEN);
