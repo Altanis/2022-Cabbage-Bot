@@ -11,7 +11,7 @@ const SharpClient = class extends Client {
         this.cabbageInfo = require('./cabbage.json');
         
         this.cabbageAttemps = {};
-        this.atStake = [];
+        this.atStake = new Map();
         this.messages = new Map();
     }
 }
@@ -73,10 +73,11 @@ client.on('messageCreate', function(message) {
                 aliases: [],
                 cabbageCount: 0,
                 minimuffins: 0,
+                turnips: 0,
             };
             client.cabbageInfo[message.author.id].aliases.push(username);
             
-            fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
+            fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));
             client.cabbageInfo = require('./cabbage.json');
             message.reply(`Successfully registered you! Current aliases: \`${client.cabbageInfo[message.author.id].aliases.join(', ')}\`.`);
         } else if (command === 'leaderboard') {
@@ -97,24 +98,24 @@ client.on('messageCreate', function(message) {
                     
                     for (let i = p * 25; i < p * 25 + 25; i++) {
                         const [id, info] = people[i];
-                        let winrate = info.minimuffins / (info.cabbageCount + info.minimuffins);
+                        let winrate = (info.minimuffins + info.turnips) / (info.cabbageCount + info.minimuffins + info.turnips);
                         if (isNaN(winrate)) winrate = 0.00;
 
                         data[p].fields.push({
                             name: `${i + 1}. ${info.aliases[0]} (\`${id}\`)`,
-                            value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${(info.minimuffins / (info.cabbageCount + info.minimuffins)).toFixed(2) * 100}%\``,
+                            value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins, \`${info.turnips}\` turnips. Win Rate: \`${winrate.toFixed(2) * 100}%\``,
                         });
                     }
                 }
             } else {
                 data[0] = { title: 'Cabbage Leaderboard', fields: [] };
                 people.forEach(([id, info], index) => {
-                    let winrate = info.minimuffins / (info.cabbageCount + info.minimuffins);
+                    let winrate = (info.minimuffins + info.turnips) / (info.cabbageCount + info.minimuffins + info.turnips);
                     if (isNaN(winrate)) winrate = 0.00;
                     
                     data[0].fields.push({
                         name: `${index + 1}. ${info.aliases[0]} (\`${id}\`):`, 
-                        value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${winrate.toFixed(2) * 100}%\``,
+                        value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins, \`${info.turnips}\` turnips. Win Rate: \`${winrate.toFixed(2) * 100}%\``,
                     });
                 });
             }
@@ -123,8 +124,6 @@ client.on('messageCreate', function(message) {
             embed.setTitle(title);
             embed.setDescription('Leaderboard of cabbaging.');
             embed.addFields(fields);
-
-            console.log(embed);
 
             message.channel.send({ embeds: [embed], })
                 .then(async msg => {
@@ -139,19 +138,57 @@ client.on('messageCreate', function(message) {
         }
     } else {
         message.content = message.content.toLowerCase();
-        
-        if (client.atStake.includes(message.author.id)) {
-            if (message.content.replaceAll(' ', '').startsWith('minimuffin')) {
+        const info = client.atStake.get(message.author.id);
+
+        const embed = new EmbedBuilder()
+            .setTitle('Cabbaging');
+
+        if (info) {
+            if (message.content.startsWith('minimuffin')) {
+                client.atStake.delete(message.author.id);
                 client.cabbageInfo[message.author.id].minimuffins++;
-                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
-                message.reply(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`, { allowedMentions });
+                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));
+
+                embed.setColor('Green')
+                    .setDescription(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`)
+                    .addFields({
+                        name: 'Incriminating Message', value: `[Jump!](${info.link})`
+                    });
+
+                message.reply({ embeds: [embed] });
+            } else if (message.content.startsWith('turnip') && ((Date.now() - info.timestamp) >= 10000)) {
+                client.atStake.delete(message.author.id);
+                client.cabbageInfo[message.author.id].turnips++;
+                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));
+
+                embed.setColor('Green')
+                    .setDescription(`You have used a turnip. Turnip usage: \`${client.cabbageInfo[message.author.id].turnips}\`.`)
+                    .addFields({
+                        name: 'Incriminating Message', value: `[Jump!](${info.link})`
+                    });
+
+                message.reply({ embeds: [embed] });
             } else {
-                // if (message.content.startsWith('turnip') && client.cabbageAttempts)
-                client.atStake.splice(client.atStake.indexOf(message.author.id), 1);
-                client.cabbageInfo[message.author.id].cabbageCount++;
-                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
-                message.reply(`You have been cabbaged. Total cabbage count: \`${client.cabbageInfo[message.author.id].cabbageCount}\`.`);
+                info.cabbageable = true;
             }
+        }  
+        
+        if (message.content.startsWith('cabbage')) {
+            client.atStake.forEach(info => {
+                if (info.authorID === message.author.id && info.cabbageable) {
+                    client.atStake.delete(info.id);
+                    client.cabbageInfo[info.id].cabbageCount++;
+                    fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo, null, 4));    
+
+                    embed.setColor('Red')
+                        .setDescription(`You have been cabbaged by <@${info.authorID}>. Cabbage count: \`${client.cabbageInfo[info.id].cabbageCount}\`.`)
+                        .addFields({
+                            name: 'Incriminating Message', value: `[Jump!](${info.link})`
+                        });
+
+                    message.reply({ embeds: [embed] });
+                }
+            });
         }
 
         // SLOW CODE INCOMING: ⚠
@@ -163,6 +200,12 @@ client.on('messageCreate', function(message) {
         // ok phew no more slow code
         
         if (!id) return;
-        if (message.author.id !== id && !client.atStake.includes(id)) client.atStake.push(id);
+        if (message.author.id !== id && !client.atStake.get(id)) client.atStake.set(id, {
+            link: `https://discord.com/channels/${message.guild.id}/${message.channel.id}/${message.id}`,
+            timestamp: Date.now(), 
+            authorID: message.author.id,
+            id,
+            cabbageable: false,
+        });
     }
 });
