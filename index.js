@@ -81,7 +81,7 @@ client.on('messageCreate', function(message) {
         } else if (command === 'leaderboard') {
             const p = client.cabbageInfo;
             let people = Object.entries(p);
-            people = people.sort((a, b) => b.cabbageCount > a.cabbageCount);
+            people = people.sort((a, b) => b[1].cabbageCount - a[1].cabbageCount);
             
             const embed = new EmbedBuilder();
             const data = [];
