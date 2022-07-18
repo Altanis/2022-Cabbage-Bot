@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-const { Client, MessageEmbed, MessageActionRow, MessageButton } = require('discord.js');
+const { Client, EmbedBuilder } = require('discord.js');
 const fs = require('node:fs');
 
 const SharpClient = class extends Client {
@@ -15,7 +15,7 @@ const SharpClient = class extends Client {
     }
 }
 
-const client = new SharpClient({ intents: [131071] });
+const client = new SharpClient({ intents: [131071], allowedMentions: { repliedUser: false } });
 
 
 client.login(process.env.TOKEN);
@@ -35,10 +35,11 @@ client.on('messageReactionAdd', function(reaction, user) {
         currentPage--;
     }
 
-    const embed = new MessageEmbed();
+    const embed = new EmbedBuilder();
     const { title, fields } = data;
     embed.setTitle(title);
-    embed.addFields(fields);
+    embed.setDescription('Leaderboard of cabbaging.');
+
 
     reaction.message.edit({ embeds: [embed] })
         .then(async msg => {
@@ -56,9 +57,9 @@ client.on('messageReactionAdd', function(reaction, user) {
 client.on('messageCreate', function(message) {
     if (message.author.bot) return;
     
-    if (message.content.startsWith(prefix)) {
+    if (message.content.startsWith(client.PREFIX)) {
         const args = message.content.split(' '),
-        command = args.shift().toLowerCase().replace(PREFIX, '');
+        command = args.shift().toLowerCase().replace(client.PREFIX, '');
         
         if (command === 'register') {
             // EXAMPLE COMMAND:
@@ -74,7 +75,7 @@ client.on('messageCreate', function(message) {
             };
             client.cabbageInfo[message.author.id].aliases.push(username);
             
-            fs.writeFileSync('./cabbage.json', client.cabbageInfo);
+            fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
             client.cabbageInfo = require('./cabbage.json');
             message.reply(`Successfully registered you! Current aliases: \`${client.cabbageInfo[message.author.id].aliases.join(', ')}\`.`);
         } else if (command === 'leaderboard') {
@@ -82,8 +83,8 @@ client.on('messageCreate', function(message) {
             let people = Object.entries(p);
             people = people.sort((a, b) => b.cabbageCount - a.cabbageCount);
             
-            const embed = new MessageEmbed();
-            const data = { title: '', fields: [] };
+            const embed = new EmbedBuilder();
+            const data = [];
             
             if (people.length > 25) {
                 const count = Math.ceil(people.length / 25);
@@ -102,8 +103,8 @@ client.on('messageCreate', function(message) {
                     }
                 }
             } else {
+                data[0] = { title: 'Cabbage Leaderboard', fields: [] };
                 people.forEach(([id, info], index) => {
-                    data[0].title = 'Cabbage Leaderboard';
                     data[0].fields.push({
                         name: `${index + 1}. <@${id}> (\`${id}\`):`, 
                         value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${(info.muffins / (info.cabbages + info.muffins)).toFixed(2) * 100}%\``,
@@ -114,9 +115,13 @@ client.on('messageCreate', function(message) {
             }
             
             const { title, fields } = data[0];
+            embed.setTitle(title);
+            embed.setDescription('Leaderboard of cabbaging.');
             embed.addFields(fields);
 
-            message.channel.send({ embeds: [embed], components: [row], })
+            console.log(embed);
+
+            message.channel.send({ embeds: [embed], })
                 .then(async msg => {
                     await msg.react('➡️');
 
@@ -126,29 +131,30 @@ client.on('messageCreate', function(message) {
                         author: message.author.id,
                     });
                 });
-        } else {
-            // SLOW CODE INCOMING: ⚠
-            const username = message.content.split(' ').pop();
-            const id = null;
-            Object.entries(client.cabbageInfo).forEach(([id, info]) => {
-                if (info.aliases.includes(username)) id = identifier;
-            });
-            // ok phew no more slow code
-            
-            if (!id) return;
-            if (message.author.id !== id) client.atStake.push(id);
-            
-            if (client.atStake.includes(message.author.id)) {
-                if (message.content.replaceAll(' ', '').includes('minimuffin')) {
-                    client.cabbageInfo[message.author.id].minimuffins++;
-                    fs.writeFileSync('./cabbage.json', client.cabbageInfo);
-                    message.reply(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`);
-                } else {
-                    client.cabbageInfo[message.author.id].cabbageCount++;
-                    fs.writeFileSync('./cabbage.json', client.cabbageInfo);
-                    message.reply(`You have been cabbaged. Total cabbage count: \`${client.cabbageInfo[message.author.id].cabbageCount}\`.`);
-                }
+        }
+    } else {
+        if (client.atStake.includes(message.author.id)) {
+            if (message.content.replaceAll(' ', '').includes('minimuffin')) {
+                client.cabbageInfo[message.author.id].minimuffins++;
+                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
+                message.reply(`You have used a minimuffin. Minimuffin usage: \`${client.cabbageInfo[message.author.id].minimuffins}\`.`, { allowedMentions });
+            } else {
+                client.atStake.splice(client.atStake.indexOf(message.author.id), 1);
+                client.cabbageInfo[message.author.id].cabbageCount++;
+                fs.writeFileSync('./cabbage.json', JSON.stringify(client.cabbageInfo));
+                message.reply(`You have been cabbaged. Total cabbage count: \`${client.cabbageInfo[message.author.id].cabbageCount}\`.`);
             }
         }
+
+        // SLOW CODE INCOMING: ⚠
+        const username = message.content.split(' ').pop();
+        let id = null;
+        Object.entries(client.cabbageInfo).forEach(([identifier, info]) => {
+            if (info.aliases.includes(username)) id = identifier;
+        });
+        // ok phew no more slow code
+        
+        if (!id) return;
+        if (message.author.id !== id && !client.atStake.includes(id)) client.atStake.push(id);
     }
 });
