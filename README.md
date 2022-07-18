@@ -5,11 +5,10 @@ A bot which counts how many cabbages and minimuffins someone has received/used. 
 - Cabbaged: Receiving a cabbage
 
 ## How to Play
-If you refer to someone at the end of your sentence, that person is susceptible to getting "cabbaged". Examples include:
-- i hate you, altanis
-- hi altanis
-- bro altanis
-<br>
+- If you refer to someone at the end of your sentence, that person is susceptible to getting "cabbaged". Examples include:
+    - i hate you, altanis
+    - hi altanis
+    - bro altanis
 - To avoid getting "cabbaged", the target must start off their sentence with the word "minimuffin". They may send anything after minimuffin.
 - If two people have targeted this person, only one minimuffin has to be used to nullify the cabbaging effect.
     - **BEWARE: PEOPLE WHO USE MINIMUFFINS CAN TRY CABBAGING SOMEONE IN THE SAME SENTENCE.**
