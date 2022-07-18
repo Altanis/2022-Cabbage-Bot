@@ -32,3 +32,7 @@ The person's cabbaging attempt **must** end with an alias the bot knows (from  t
 You can use the command `.leaderboard` to get a leaderboard, sorted from the people with the most amount of cabbages to the least amount of cabbages.
 
 ## Example of Bot Usage
+![image](https://user-images.githubusercontent.com/38045884/179511101-20827416-3c80-4aba-98fc-ac629875bd3c.png)
+![image](https://user-images.githubusercontent.com/38045884/179511179-4860731d-4d6a-4b30-9f9e-dd5e81f306c8.png)
+![image](https://user-images.githubusercontent.com/38045884/179511223-e127726f-f48f-4b29-922b-07066f2c2e3a.png)
+![image](https://user-images.githubusercontent.com/38045884/179511271-1a768ebe-3d9b-4987-ad93-b20e0ce742d1.png)
