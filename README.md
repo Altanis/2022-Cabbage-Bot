@@ -19,3 +19,14 @@ A bot which counts how many cabbages and minimuffins someone has received/used. 
 - If the person does not cabbage the target within 10 seconds, the player can say "turnip" and the cabbage cannot process.
 - If the person does not cabbage you properly but still sends "cabbage", the target can cabbage them back by saying "cabbage improper usage".
 - If someone says "i am <adjective>", adjective being anything like "tired", "hungry", etc, that can be a new temporary alias until 10 seconds have passed or you have already gotten cabbaged.
+
+
+## Bot Usage
+<p>To engage in the cabbage game, you must use the command `.register`. The arguments passed in will be your name.<br>
+EXAMPLE: `.register altanis`<br>
+You may register more than once to have different aliases.<br>
+
+After that, people who have registered must play the game themselves. The bot will detect if that person has been cabbaged.<br>
+The person's cabbaging attempt **must** end with an alias the bot knows (from  the `.register` command), or else it won't work.<p>
+
+You can use the command `.leaderboard` to get a leaderboard, sorted from the people with the most amount of cabbages to the least amount of cabbages.
