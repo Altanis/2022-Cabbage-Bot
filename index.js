@@ -81,7 +81,7 @@ client.on('messageCreate', function(message) {
         } else if (command === 'leaderboard') {
             const p = client.cabbageInfo;
             let people = Object.entries(p);
-            people = people.sort((a, b) => b.cabbageCount - a.cabbageCount);
+            people = people.sort((a, b) => b.cabbageCount > a.cabbageCount);
             
             const embed = new EmbedBuilder();
             const data = [];
@@ -96,21 +96,25 @@ client.on('messageCreate', function(message) {
                     
                     for (let i = p * 25; i < p * 25 + 25; i++) {
                         const [id, info] = people[i];
+                        let winrate = info.minimuffins / (info.cabbageCount + info.minimuffins);
+                        if (isNaN(winrate)) winrate = 0.00;
+
                         data[p].fields.push({
-                            name: `${i + 1}. <@${id}> (\`${id}\`)`,
-                            value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${(info.muffins / (info.cabbages + info.muffins)).toFixed(2) * 100}%\``,
+                            name: `${i + 1}. ${info.aliases[0]} (\`${id}\`)`,
+                            value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${(info.minimuffins / (info.cabbageCount + info.minimuffins)).toFixed(2) * 100}%\``,
                         });
                     }
                 }
             } else {
                 data[0] = { title: 'Cabbage Leaderboard', fields: [] };
                 people.forEach(([id, info], index) => {
-                    data[0].fields.push({
-                        name: `${index + 1}. <@${id}> (\`${id}\`):`, 
-                        value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${(info.muffins / (info.cabbages + info.muffins)).toFixed(2) * 100}%\``,
-                    });
+                    let winrate = info.minimuffins / (info.cabbageCount + info.minimuffins);
+                    if (isNaN(winrate)) winrate = 0.00;
                     
-                    message.channel.send({ embeds: [embed] });
+                    data[0].fields.push({
+                        name: `${index + 1}. ${info.aliases[0]} (\`${id}\`):`, 
+                        value: `\`${info.cabbageCount}\` cabbages, \`${info.minimuffins}\` minimuffins. Win Rate: \`${winrate.toFixed(2) * 100}%\``,
+                    });
                 });
             }
             
@@ -123,7 +127,7 @@ client.on('messageCreate', function(message) {
 
             message.channel.send({ embeds: [embed], })
                 .then(async msg => {
-                    await msg.react('➡️');
+                    await msg.react('➡️'); // bugged
 
                     client.messages.set(msg.id, {
                         data,
