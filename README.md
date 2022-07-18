@@ -33,6 +33,7 @@ You can use the command `.leaderboard` to get a leaderboard, sorted from the peo
 
 ## Example of Bot Usage
 ![image](https://user-images.githubusercontent.com/38045884/179511101-20827416-3c80-4aba-98fc-ac629875bd3c.png)
-![image](https://user-images.githubusercontent.com/38045884/179511179-4860731d-4d6a-4b30-9f9e-dd5e81f306c8.png)
-![image](https://user-images.githubusercontent.com/38045884/179511223-e127726f-f48f-4b29-922b-07066f2c2e3a.png)
-![image](https://user-images.githubusercontent.com/38045884/179511271-1a768ebe-3d9b-4987-ad93-b20e0ce742d1.png)
+![image](https://user-images.githubusercontent.com/38045884/179521595-b1813221-f78f-455f-9be3-3543ed57655d.png)
+![image](https://user-images.githubusercontent.com/38045884/179521626-c8fee93f-7367-4dcb-80a0-a8648ce00683.png)
+![image](https://user-images.githubusercontent.com/38045884/179521733-d4e87984-12f6-46b8-9fb2-11f40152f207.png)
+![image](https://user-images.githubusercontent.com/38045884/179521757-4da6ebed-7da0-4c89-880d-27b67210b4c9.png)
