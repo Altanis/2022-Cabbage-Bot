@@ -1,5 +1,5 @@
 # Cabbage Bot
-A bot which counts how many cabbages and minimuffins someone has received/used. A running joke within BxSci.
+A bot which counts how many cabbages and minimuffins someone has received/used.
 Inspiration from [a repo AngleSideAngle made](https://github.com/AngleSideAngle/Cabbage), check it out!
 
 ## Key Terms
